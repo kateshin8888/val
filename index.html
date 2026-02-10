@@ -1,134 +1,153 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Be My Valentine?</title>
-  <style>
-    :root { --card-w: 560px; }
-    body{
-      margin:0; min-height:100vh; display:grid; place-items:center;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: linear-gradient(135deg, #ffe6ee, #fff3f7);
-      overflow:hidden;
-    }
-    .card{
-      width:min(var(--card-w), 92vw);
-      background:#fff; border-radius:18px; padding:28px;
-      box-shadow: 0 14px 40px rgba(0,0,0,.12);
-      text-align:center;
-      position:relative;
-      z-index:2;
-    }
-    h1{ margin:0 0 10px; font-size:28px; }
-    p{ margin:0 0 18px; opacity:.85; }
-    .btns{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-    button{
-      border:0; padding:12px 16px; border-radius:14px;
-      font-size:16px; font-weight:700; cursor:pointer;
-      box-shadow: 0 10px 24px rgba(0,0,0,.10);
-    }
-    #yes{
-      background:#ff4d7d; color:white;
-      transform: translateY(0);
-    }
-    #yes:hover{ transform: translateY(-1px); }
-    #no{
-      background:#f2f2f2; color:#222;
-      position:fixed; /* so we can move it anywhere on the screen */
-      left:50%; top:60%;
-      transform: translate(-50%, -50%);
-      z-index:1;
-    }
-    .hidden{ display:none !important; }
-    .msg{ margin-top:18px; font-size:18px; font-weight:700; }
-    .sub{ margin-top:8px; font-size:14px; opacity:.75; font-weight:600; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Be My Valentine?</title>
+
+<style>
+:root { --card-w: 560px; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: linear-gradient(135deg, #ffe6ee, #fff3f7);
+  overflow:hidden;
+}
+
+.card{
+  width:min(var(--card-w), 92vw);
+  background:#fff;
+  border-radius:18px;
+  padding:28px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.12);
+  text-align:center;
+  position:relative;
+}
+
+/* Button container */
+.btns{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  position:relative;   /* important */
+  height:60px;         /* space for NO to move */
+}
+
+button{
+  border:0;
+  padding:12px 18px;
+  border-radius:14px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow: 0 10px 24px rgba(0,0,0,.10);
+}
+
+#yes{
+  background:#ff4d7d;
+  color:white;
+}
+
+#no{
+  background:#f2f2f2;
+  color:#222;
+  position:absolute;   /* changed */
+  left:120px;
+  top:0;
+}
+
+.hidden{ display:none !important; }
+
+.msg{
+  margin-top:18px;
+  font-size:18px;
+  font-weight:700;
+}
+
+.sub{
+  margin-top:8px;
+  font-size:14px;
+  opacity:.75;
+  font-weight:600;
+}
+</style>
 </head>
+
 <body>
-  <div class="card" id="card">
-    <div style="font-size:44px; margin-bottom:6px;">❤️</div>
-    <h1>Will you be my Valentine?</h1>
-    <p>I made this just for you.</p>
 
-    <div class="btns">
-      <button id="yes">YES</button>
-    </div>
+<div class="card">
 
-    <div class="msg hidden" id="msg"></div>
-    <div class="sub hidden" id="sub"></div>
+  <div style="font-size:44px; margin-bottom:6px;">❤️</div>
+
+  <h1>Will you be my Valentine?</h1>
+
+  <p>I made this just for you.</p>
+
+  <!-- BOTH BUTTONS TOGETHER -->
+  <div class="btns">
+    <button id="yes">YES</button>
+    <button id="no">NO</button>
   </div>
 
-  <button id="no" aria-label="No">NO</button>
+  <div class="msg hidden" id="msg"></div>
+  <div class="sub hidden" id="sub"></div>
 
-  <script>
-    const yesBtn = document.getElementById("yes");
-    const noBtn  = document.getElementById("no");
-    const msg    = document.getElementById("msg");
-    const sub    = document.getElementById("sub");
+</div>
 
-    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+<script>
 
-    function moveNoButton() {
-      const padding = 12;
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
+const yesBtn = document.getElementById("yes");
+const noBtn  = document.getElementById("no");
+const msg    = document.getElementById("msg");
+const sub    = document.getElementById("sub");
 
-      // measure button (fallback sizes if not yet laid out)
-      const rect = noBtn.getBoundingClientRect();
-      const bw = rect.width  || 90;
-      const bh = rect.height || 44;
+function moveNo(){
 
-      // keep inside viewport
-      const x = Math.random() * (vw - bw - padding*2) + padding;
-      const y = Math.random() * (vh - bh - padding*2) + padding;
+  const parent = document.querySelector(".btns");
+  const box = parent.getBoundingClientRect();
+  const btn = noBtn.getBoundingClientRect();
 
-      noBtn.style.left = `${clamp(x, padding, vw - bw - padding)}px`;
-      noBtn.style.top  = `${clamp(y, padding, vh - bh - padding)}px`;
-      noBtn.style.transform = "none";
-    }
+  const x = Math.random() * (box.width - btn.width);
+  const y = Math.random() * (box.height - btn.height);
 
-    // Make NO run away when cursor gets close
-    function onMouseMove(e){
-      const r = noBtn.getBoundingClientRect();
-      const cx = r.left + r.width/2;
-      const cy = r.top  + r.height/2;
-      const dx = e.clientX - cx;
-      const dy = e.clientY - cy;
-      const dist = Math.hypot(dx, dy);
+  noBtn.style.left = x + "px";
+  noBtn.style.top  = y + "px";
+}
 
-      if (dist < 120) moveNoButton();
-    }
 
-    // Desktop: evade cursor
-    window.addEventListener("mousemove", onMouseMove);
+/* Run away on hover (desktop) */
+noBtn.addEventListener("mouseenter", moveNo);
 
-    // Mobile: if they try to tap near it, jump
-    noBtn.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      moveNoButton();
-    }, {passive:false});
+/* Run away on tap (mobile) */
+noBtn.addEventListener("touchstart", e => {
+  e.preventDefault();
+  moveNo();
+});
 
-    // Also jump if they somehow click it
-    noBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      moveNoButton();
-    });
 
-    yesBtn.addEventListener("click", () => {
-      msg.classList.remove("hidden");
-      sub.classList.remove("hidden");
-      msg.textContent = "YAY. You’re officially my Valentine 💘";
-      sub.textContent = "Now come claim your hug + kiss (redeemable immediately).";
-      // optional: remove NO after yes
-      noBtn.classList.add("hidden");
-      yesBtn.disabled = true;
-      yesBtn.textContent = "YES ✅";
-    });
+/* Click YES */
+yesBtn.addEventListener("click", () => {
 
-    // place NO somewhere not overlapping the card at start
-    moveNoButton();
-    window.addEventListener("resize", moveNoButton);
-  </script>
+  msg.classList.remove("hidden");
+  sub.classList.remove("hidden");
+
+  msg.textContent = "i love you 💘";
+  sub.textContent = "😘";
+
+  noBtn.classList.add("hidden");
+
+  yesBtn.textContent = "YES ✅";
+  yesBtn.disabled = true;
+});
+
+
+</script>
+
 </body>
 </html>
+
+
